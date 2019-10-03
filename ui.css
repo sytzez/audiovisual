@@ -1,0 +1,101 @@
+.bar {
+  position: absolute;
+
+  padding: 10px;
+  border-radius: 24px;
+  border: 3px solid #ccc;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ccc;
+  opacity: 1;
+
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+
+  transition: color 0.5s, border-color 0.5s, opacity 1s;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+.bar:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  margin: -60px;
+  padding: 0px;
+
+  border-radius: 60px;
+  border: 4px solid #ccc;
+  background: rgba(0, 0, 0, 0.5);
+  color: #ccc;
+
+  cursor: pointer;
+
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 42px;
+  
+  transition: color 0.5s, border-color 0.5s;
+}
+
+.play.hidden {
+  visibility: hidden;
+}
+
+.play:hover {
+  border-color: #fff;
+  color: #fff;
+}
+
+.topleft {
+  top: 8px;
+  left: 8px;
+}
+
+.right {
+  top: 8px;
+  right: 8px;
+}
+
+.botleft {
+  bottom: 8px;
+  left: 8px;
+}
+
+a {
+  color: #ccc;
+  font-weight: bold;
+  transition: color 0.5s;
+}
+
+a:hover {
+  color: #fff;
+}
+
+button {
+  padding: 8px;
+  border-radius: 24px;
+  border: 3px solid #ccc;
+  background: transparent;
+  color: #ccc;
+
+  cursor: pointer;
+
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  
+  transition: color 0.5s, border-color 0.5s;
+}
+
+button:hover {
+  border-color: #fff;
+  color: #fff;
+}

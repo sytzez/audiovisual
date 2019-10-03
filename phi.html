@@ -1,7 +1,21 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Phi - Sytze Zeylmaker</title>
-
+    <style>
+      html, body {
+				width: 100%;
+				height: 100%;
+				margin: 0px;
+				background: #000;
+			}
+			#canv {
+				display: block;
+				margin: 0 auto;
+				height: 100%;
+			}
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
 		<link rel="stylesheet" href="ui.css">
   </head>
 
@@ -9,8 +23,8 @@
   <script src="phi/audio.js"></script>
   <script src="phi/control.js"></script>
 
-  <body style="width: 100%; height: 100%; margin: 0px; background: #000">
-    <canvas id="canv" width=64 height=64 style="display: block; margin: 0 auto; height: 100%;"></canvas>
+  <body>
+    <canvas id="canv" width=64 height=64></canvas>
     
     <div class="bar topleft hidden">
       <a href="/av#phi">Phi</a> (2018)
