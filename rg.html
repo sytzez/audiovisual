@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <style>
+      body {
+        background: #000;
+      }
+      canvas {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+    
+		<link rel="stylesheet" href="ui.css">
+  </head>
+
+  <body>
+
+    <canvas id="canv" width=2048 height=1024>
+    </canvas>
+
+    <div class="bar topleft hidden">
+      <a href="/av#rg">Red Green</a> (2015)
+      <br>
+      by <a href="/">Sytze Zeylmaker</a>
+      <br><br>
+      volume:
+      <input type="range" min="0" max="100" value="50" id="volume" class="slider">
+      <br>
+			<button id="stop">stop</button>
+    </div>
+    
+	  <div class="bar botleft hidden">
+      other audiovisual works:<br>
+      <a href="/av/phi">Phi</a> (2018)<br>
+      <a href="/av/waves">Waves</a> (2016)<br>
+      <a href="/av/shapes">Shapes</a> (2015)<br>
+    </div>
+    
+		<button id="play" class="play">play</button>
+  </body>
+
+  <script src="shader.js"></script>
+  <script src="rg/control.js"></script>
+  <script src="rg/score.js"></script>
+
+  <script id="vshader" type="x-shader/x-vertex">
+
+    attribute vec2 a_position;
+
+    void main() {
+      gl_Position = vec4(a_position, 0, 1);
+    }
+
+  </script>
+
+  <script id="waveshader" type="x-shader/x-fragment">
+    precision highp float;
+
+    uniform sampler2D u_fb;
+    uniform sampler2D u_wave;
+
+    uniform vec2 u_scale;
+    uniform vec2 u_move;
+    uniform float u_kill;
+
+    uniform float u_shift;
+    uniform float u_width;
+    uniform float u_period;
+
+    uniform int u_pick;
+
+    void main() {
+      vec2 coord = (gl_FragCoord.xy - u_move) / u_scale;
+
+      vec3 pick = vec3(texture2D(u_fb, coord));
+      if (u_pick > 1) pick = vec3(texture2D(u_fb, pick.xy));
+      if (u_pick > 2) pick = vec3(texture2D(u_fb, pick.xy));
+
+      if (coord.x>sin(coord.y * 3.14 * u_period) - u_width
+      &&	coord.x<sin(coord.y * 3.14 * u_period) + u_width)
+          pick = vec3(coord.x * 0.5 + 0.5 - u_shift, coord.y * 0.5 + 0.5 - u_shift, 0.0);
+      
+      gl_FragColor = vec4(pick * u_kill, 1.0);
+    }
+  </script>
+
+  <script id="twistshader" type="x-shader/x-fragment">
+    precision highp float;
+
+    uniform sampler2D u_fb;
+
+    uniform vec2 u_scale;
+    uniform vec2 u_move;
+    uniform float u_rot;
+    uniform float u_kill;
+
+    uniform float u_intense;
+    uniform float u_dense;
+    uniform float u_phase;
+
+    uniform int u_pick;
+
+    void main() {
+      vec2 coord = (gl_FragCoord.xy - u_move) / u_scale;
+      coord = vec2(coord.x * cos(u_rot) + coord.y*sin(u_rot), coord.x * sin(u_rot) + coord.y*cos(u_rot));
+      
+      vec3 pick = vec3(texture2D(u_fb, coord));
+      if (u_pick > 1) pick = vec3(texture2D(u_fb, pick.xy));
+      if (u_pick > 2) pick = vec3(texture2D(u_fb, pick.xy));
+      //pick = vec3(texture2D(u_fb, pick.xy));
+
+      pick.x += cos(coord.x * u_dense + u_phase)*u_intense;
+      pick.y += cos(coord.y * u_dense + u_phase)*u_intense;
+
+      gl_FragColor = vec4(pick * u_kill, 1.0);
+    }
+  </script>
+
+  <script id="fshader" type="x-shader/x-fragment">
+    precision highp float;
+
+    uniform sampler2D u_fb;
+
+    uniform vec2 u_scale;
+    uniform vec2 u_move;
+    uniform vec4 u_osc;
+
+    void main() {
+      vec2 coord = (gl_FragCoord.xy - u_move) / u_scale;
+      vec3 pick = vec3(texture2D(u_fb, coord));
+      
+      pick.xy += vec2(sin(coord.x * u_osc.x), cos(coord.y * u_osc.y)) * 0.3;
+      pick = vec3(texture2D(u_fb, vec2(pick.y * 1.0, pick.x)));
+      pick.xy -= vec2(sin(coord.x * u_osc.z), cos(coord.y * u_osc.w)) * 0.01;
+
+      gl_FragColor = vec4(pick, 1.0);
+    }
+  </script>
+
+  <script src="rg/rg.js"></script>
+
+  <script src="ui.js"></script>
+
+  <script>
+    [
+			["volume", "input", function(e) {
+				volume.gain.value = e.srcElement.value / 100.0;
+			}],
+			["play", "click", function(e) {
+				play();
+				e.srcElement.classList.add("hidden");
+      }],
+      ["stop", "click", function() {
+        stop();
+        document.getElementById("play").classList.remove("hidden");
+			}]
+    ].forEach(function(v) {
+			document.getElementById(v[0]).addEventListener(v[1], v[2]);
+		});
+  </script>
+
+</html>

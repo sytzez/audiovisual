@@ -1,0 +1,191 @@
+<html>
+  <head>
+    <title>Phi - Sytze Zeylmaker</title>
+
+		<link rel="stylesheet" href="ui.css">
+  </head>
+
+  <script src="phi/phi.js"></script>
+  <script src="phi/audio.js"></script>
+  <script src="phi/control.js"></script>
+
+  <body style="width: 100%; height: 100%; margin: 0px; background: #000">
+    <canvas id="canv" width=64 height=64 style="display: block; margin: 0 auto; height: 100%;"></canvas>
+    
+    <div class="bar topleft hidden">
+      <a href="/av#phi">Phi</a> (2018)
+      <br>
+      by <a href="/">Sytze Zeylmaker</a>
+      <br><br>
+      volume:
+      <input type="range" min="0" max="100" value="100" id="volume" class="slider">
+      <br>
+			resolution:
+			<select id="resolution">
+				<option value="0">32x32</option>
+				<option value="1" selected>64x64</option>
+				<option value="2">128x128</option>
+				<option value="3">256x256</option>
+				<option value="4">512x512</option>
+				<option value="5">1024x1024</option>
+				<option value="5">2048x2048</option>
+			</select>
+			<br>
+			<button id="stop">stop</button>
+    </div>
+    
+    <div class="bar right hidden"> 
+      preset:
+      <select id="presets">
+      </select>
+
+      <hr>
+
+      <table>
+        <tr>
+          <td align="right">volume slope:</td>
+          <td><input type="range" min="1" max="100" value="30" id="slope" class="slider inpreset"></td>
+        </tr>
+        <tr>
+          <td align="right">base pitch:</td>
+          <td><input type="range" min="1" max="4" value="1" id="pitch" class="slider inpreset"></td>
+        </tr>
+        <tr>
+          <td align="right">bottom of range:</td>
+          <td><input type="range" min="0" max="8" value="2" id="bottom" class="slider inpreset"></td>
+        </tr>
+        <tr>
+          <td align="right">top of range:</td>
+          <td><input type="range" min="0" max="8" value="6" id="top" class="slider inpreset"></td>
+        </tr>
+        <tr>
+          <td align="right">rhythmic division:</td>
+          <td><input type="range" min="1" max="6" value="3" id="rhythm" class="slider inpreset"></td>
+        </tr>
+        <tr>
+          <td align="right">sparsity:</td>
+          <td><input type="range" min="1" max="6" value="3" id="gaps" class="slider inpreset"></td>
+        </tr>
+      </table>
+
+      <hr>
+
+      <button id="midi">enable MIDI</button> [<a href="#" onclick="showMidiHelp(); return false;">?</a>]
+      <br>
+      <select id="mididevice" disabled>
+        <option>pick device</option>
+      </select>
+
+      <div id="midihelp" hidden style="max-width: 300px;">
+        <br>
+        How to use a MIDI device: <br>
+        Connect the MIDI device to your computer,
+        in some cases you'll have to restart your browser after connecting it.
+        Press [enable MIDI] and pick your device.
+        To assign a MIDI control to a slider, press [link MIDI input], move a slider on the screen,
+        and then move the MIDI control you want to link.
+      </div>
+    </div>
+    
+	  <div class="bar botleft hidden">
+      other audiovisual works:<br>
+      <a href="/av/waves">Waves</a> (2016)<br>
+      <a href="/av/shapes">Shapes</a> (2015)<br>
+      <a href="/av/rg">Red Green</a> (2015)<br>
+    </div>
+    
+		<button id="play" class="play">play</button>
+  </body>
+
+  <script id="vshader" type="x-shader/x-vertex">
+    attribute vec2 a_position;
+    void main() {
+      gl_Position = vec4(a_position, 0, 1);
+    }
+  </script>
+
+  <script id="fshader" type="x-shader/x-fragment">
+    precision highp float;
+
+    uniform sampler2D u_wave;
+    uniform float u_invres; // inverted resolution
+    const float e = 0.015;
+
+    void main() {
+      vec2 coord = gl_FragCoord.xy * vec2(u_invres, u_invres);
+
+      float pickx = texture2D(u_wave, vec2(coord.x*0.5, 0)).w;
+      float picky = texture2D(u_wave, vec2(coord.y*0.5+0.5, 0)).w;
+      float mul = (pickx+picky) / 2.0;
+      mul = (mul-0.5)/e;
+      mul = max(0.0, min(1.0, mul));
+
+      gl_FragColor = vec4(mul, mul, mul, 1.0);
+    }
+  </script>
+  
+  <script src="shader.js"></script>
+  <script src="phi/gfx.js"></script>
+
+  <script src="ui.js"></script>
+  <script src="presets.js"></script>
+
+  <script>
+    [
+      ["volume", "input", function(e) {
+        volume = e.srcElement.value / 100.0 * 0.25;
+      }],
+      ["resolution", "change", function(e) {
+        var resolution = Math.pow(2, e.srcElement.value) * 32;
+
+        document.getElementById("canv").width = resolution;
+        document.getElementById("canv").height = resolution;
+        
+        gl.viewport(0, 0, resolution, resolution);
+        
+        invres = 1.0 / resolution;
+      }],
+      ["pitch", "input", function(e) {
+        pitchmul = e.srcElement.value * 1;
+      }],
+      ["slope", "input", function(e) {
+        slope = e.srcElement.value / 100.0 * 15.0 + 1.0;
+      }],
+      ["bottom", "input", function(e) {
+        leftbound = e.srcElement.value * 1;
+        updatevoices()
+      }],
+      ["top", "input", function(e) {
+        rightbound = e.srcElement.value * 1;
+        updatevoices()
+      }],
+      ["rhythm", "input", function(e) {
+        rhythmspeed = e.srcElement.value * 1;
+        updatevoices()
+      }],
+      ["gaps", "input", function(e) {
+        gaps = e.srcElement.value * 1;
+        updatevoices()
+      }],
+      ["play", "click", function(e) {
+        start();
+        paused = false;
+        e.srcElement.classList.add("hidden");
+      }],
+      ["stop", "click", function(e) {
+        stop();
+        paused = true;
+        document.getElementById("play").classList.remove("hidden");
+      }]
+    ].forEach(function(v) {
+      document.getElementById(v[0]).addEventListener(v[1], v[2]);
+    });
+
+    InitPresets();
+    var firstpreset = new Preset("Funky", ["100","1","0","8","2","3"]);
+    new Preset("Geometry", ["1","1","0","4","1","1"]);
+    new Preset("Sub", ["35","1","0","3","5","3"]);
+    new Preset("Glitch", ["100","1","3","8","4","6"]);
+    firstpreset.apply();
+  </script>
+</html>

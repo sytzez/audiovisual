@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Shapes - Sytze Zeylmaker</title>
+	<style>
+		body {
+			background: #000;
+		}
+		canvas {
+			position: fixed;
+			left: 0px;
+			top: 0px;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+
+	<link rel="stylesheet" href="ui.css">
+</head>
+
+<body>
+
+	<canvas id="canv" width=1024 height=720>
+	</canvas>
+
+	<div class="bar topleft hidden">
+		<a href="/av#shapes">Shapes</a> (2015)
+		<br>
+		by <a href="/">Sytze Zeylmaker</a>
+		<br><br>
+		volume:
+		<input type="range" min="0" max="100" value="50" id="volume" class="slider">
+		<br>
+		resolution:
+		<select id="resolution">
+			<option value="0">full</option>
+			<option value="1">0.5x</option>
+			<option value="2" selected>0.25x</option>
+			<option value="3">0.125x</option>
+		</select>
+		<br>
+		<button id="stop">stop</button>
+	</div>
+
+	<div class="bar right hidden">
+		preset:
+		<select id="presets">
+		</select>
+
+		<hr>
+
+		<table>
+			<tr>
+				<td align="right">mode:</td>
+				<td>
+					<select id="mode" class="inpreset">
+						<option value="1" selected>1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">texture:</td>
+				<td>
+					<select id="texture" class="inpreset">
+						<option value="1" selected>random</option>
+						<option value="2">ordered</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">algorithm 1:</td>
+				<td><input type="range" min="0" max="127" value="30" id="3" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">algorithm 2:</td>
+				<td><input type="range" min="0" max="127" value="30" id="4" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">treshold:</td>
+				<td><input type="range" min="0" max="127" value="30" id="1" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">treshold shake:</td>
+				<td><input type="range" min="0" max="127" value="30" id="7" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">treshold shake speed:</td>
+				<td><input type="range" min="0" max="127" value="30" id="5" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">treshold wave:</td>
+				<td><input type="range" min="0" max="127" value="30" id="2" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">velocity:</td>
+				<td><input type="range" min="0" max="127" value="30" id="8" class="slider inpreset"></td>
+			</tr>
+			<tr>
+				<td align="right">FOV:</td>
+				<td><input type="range" min="0" max="127" value="30" id="9" class="slider inpreset"></td>
+			</tr>
+		</table>
+		
+		<hr>
+
+		<button id="midi">enable MIDI</button> [<a href="#" onclick="showMidiHelp(); return false;">?</a>]
+      <br>
+      <select id="mididevice" disabled>
+        <option>pick device</option>
+      </select>
+
+      <div id="midihelp" hidden style="max-width: 300px;">
+        <br>
+        How to use a MIDI device: <br>
+        Connect the MIDI device to your computer,
+        in some cases you'll have to restart your browser after connecting it.
+        Press [enable MIDI] and pick your device.
+        To assign a MIDI control to a slider, press [link MIDI input], move a slider on the screen,
+        and then move the MIDI control you want to link.
+      </div>
+	</div>
+
+	<div class="bar botleft hidden">
+		other audiovisual works:<br>
+		<a href="/av/phi">Phi</a> (2018)<br>
+		<a href="/av/waves">Waves</a> (2016)<br>
+		<a href="/av/rg">Red Green</a> (2015)<br>
+	</div>
+	
+	<button id="play" class="play">play</button>
+</body>
+
+<script id="vshader" type="x-shader/x-vertex">
+	attribute vec2 a_position;
+	void main() {
+		gl_Position = vec4(a_position, 0, 1);
+	}
+</script>
+
+<script id="fshader" type="x-shader/x-fragment">
+	precision highp float;
+
+	uniform sampler2D u_vox;
+	uniform vec3 u_campos;
+	uniform vec3 u_camrot;
+	uniform float u_zoom;
+	uniform vec2 u_screen;
+
+	uniform int u_mode;
+
+	uniform float u_valcmp;
+	uniform float u_valcmpshake;
+	uniform vec3 u_valcmp_freq;
+	uniform float u_valcmp_phase;
+	uniform float u_shake;
+
+	uniform int u_steps;
+
+	uniform vec3 u_col1;
+	uniform vec3 u_col2;
+
+	uniform float u_overjump;
+	uniform float u_muljump;
+
+	// source: https://stackoverflow.com/questions/19939557/
+	vec4 sampleAs3DTexture(sampler2D tex, vec3 texCoord, float size) {
+		float sliceSize = 1.0 / size;                         // space of 1 slice
+		float slicePixelSize = sliceSize / size;              // space of 1 pixel
+		float sliceInnerSize = slicePixelSize * (size - 1.0); // space of size pixels
+		float zSlice0 = mod(floor(texCoord.z * size), size);
+		float zSlice1 = mod(zSlice0 + 1.0, size);
+		float xOffset = slicePixelSize * 0.5 + texCoord.x * sliceInnerSize;
+		float s0 = xOffset + (zSlice0 * sliceSize);
+		float s1 = xOffset + (zSlice1 * sliceSize);
+		vec4 slice0Color = texture2D(tex, vec2(s0, texCoord.y));
+		vec4 slice1Color = texture2D(tex, vec2(s1, texCoord.y));
+		float zOffset = mod(texCoord.z * size, 1.0);
+		return mix(slice0Color, slice1Color, zOffset);
+	}
+
+	void main() {
+		vec2 coord = (gl_FragCoord.xy - u_screen * 0.5) / vec2(u_screen.y, u_screen.y);
+		coord = coord * u_zoom;
+		vec3 vecx = normalize(vec3(u_camrot.z, 0, -u_camrot.x));
+		vec3 vecy = cross(vecx, u_camrot);
+		vec3 pos = u_campos;
+		vec3 dir = normalize(u_camrot + coord.x * vecx + coord.y * vecy);
+		vec4 sample;
+		float val = 1.0;
+		float dep = 0.0;
+		int hit = 0;
+		float shake = 0.0;
+		
+		for(int i = 0; i < 127; i++) {
+			if (i > u_steps) break;
+			
+			sample = sampleAs3DTexture(u_vox, pos, 32.0); // originally 64.0
+			val = sample.a;
+			shake = cos(u_valcmp_freq.x * pos.x + u_valcmp_phase)
+					+ cos(u_valcmp_freq.y * pos.y + u_valcmp_phase)
+					+ cos(u_valcmp_freq.z * pos.z + u_valcmp_phase)
+					* 0.5 + 0.5;
+			
+			if (val <= u_valcmp * (1.0 - u_valcmpshake * shake)) {
+			//if (val <= u_valcmp * (sin(dot(u_valcmp_freq, pos) + u_valcmp_phase) * 0.5 + 0.5)) {
+				//dir -= 2.0 * dot(sample.xyz, dir) * sample.xyz;
+				hit = 1;
+				break;
+			}
+			dep += val;
+			pos += dir * (val * u_muljump + u_overjump) + u_shake
+				* vec3(cos(u_valcmp_freq.x * pos.x + u_valcmp_phase), 
+					cos(u_valcmp_freq.y * pos.y + u_valcmp_phase), 
+					cos(u_valcmp_freq.z * pos.z + u_valcmp_phase));
+		}
+		
+		float shade = pow(1.0 - dep * 0.3, 2.5);
+		if (u_mode == 3 && hit == 0) shade = 0.0;
+		if (u_mode != 1 && hit == 0) sample.rgb = vec3(0.8, 0.8, 0.8);
+		if (u_mode == 4 && hit == 1) sample.rgb = vec3(0.8, 0.8, 0.8);
+		
+		gl_FragColor = vec4(shade * (sample.rgb * 0.9 + vec3(0.1, 0.1, 0.1)) , 1.0);
+	}
+
+</script>
+
+<script src="shader.js"></script>
+<script src="shapes/shapes.js"></script>
+
+<script src="ui.js"></script>
+<script src="presets.js"></script>
+
+<script>
+	window.addEventListener("resize", function() {
+		width = document.documentElement.clientWidth * res;
+		height = document.documentElement.clientHeight * res;
+
+		canv.width = width;
+		canv.height = height;
+		gl.viewport(0, 0, width, height);
+		
+		recalcAudio();
+	});
+
+	[
+		["play", "click", function(e) {
+			audio.resume();
+			recalcAudio();
+			paused = false;
+			e.srcElement.classList.add("hidden");
+		}],
+		["stop", "click", function(e) {
+			audio.suspend();
+			paused = true;
+			document.getElementById("play").classList.remove("hidden");
+		}],
+		["volume", "input", function(e) {
+			volume.gain.value = e.srcElement.value / 100.0;
+		}],
+		["resolution", "change", function(e) {
+			res = Math.pow(0.5, e.srcElement.value);
+
+			width = document.documentElement.clientWidth * res;
+			height = document.documentElement.clientHeight * res;
+
+			canv.width = width;
+			canv.height = height;
+			gl.viewport(0, 0, width, height);
+			
+			recalcAudio();
+		}],
+		["mode", "change", function(e) {
+			mode = e.srcElement.value * 1;
+		}],
+		["texture", "change", function(e) {
+			tex = e.srcElement.value * 1;
+		}],
+		["1", "input", function(e) {
+			param[0] = e.srcElement.value / 127.0;
+		}],
+		["2", "input", function(e) {
+			param[2] = e.srcElement.value / 127.0;
+		}],
+		["3", "input", function(e) {
+			param[16] = e.srcElement.value / 127.0;
+		}],
+		["4", "input", function(e) {
+			param[17] = e.srcElement.value / 127.0;
+		}],
+		["5", "input", function(e) {
+			param[18] = e.srcElement.value / 127.0;
+		}],
+		["7", "input", function(e) {
+			param[20] = e.srcElement.value / 127.0;
+		}],
+		["8", "input", function(e) {
+			param[7] = e.srcElement.value / 127.0;
+		}],
+		["9", "input", function(e) {
+			param[23] = e.srcElement.value / 127.0;
+		}]
+	].forEach(function(v) {
+		document.getElementById(v[0]).addEventListener(v[1], v[2]);
+	});
+
+	InitPresets();
+	var firstpreset = new Preset("Clouds", ["4","1","48","0","0","0","0","0","34","105"]);
+	new Preset("Confetti", ["3","1","55","0","74","98","0","20","22","102"]);
+	new Preset("Neon Scratch", ["3","1","57","0","127","0","0","0","74","10"]);
+	new Preset("Liquid Paint", ["1","1","21","62","0","0","0","0","19","10"]);
+	new Preset("Dimensions", ["4","2","81","0","0","0","0","0","61","127"]);
+	new Preset("The Grid", ["4","2","98","0","127","92","0","2","30","45"]);
+
+	firstpreset.apply();
+</script>
+
+</html>

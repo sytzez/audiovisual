@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Waves - Sytze Zeylmaker</title>
+
+		<style>
+			html, body {
+				width: 100%;
+				height: 100%;
+				margin: 0px;
+				background: #000;
+			}
+			#canvas {
+				display: block;
+				margin: 0 auto;
+				height: 100%;
+			}
+		</style>
+
+		<link rel="stylesheet" href="ui.css">
+	</head>
+	
+	<body>
+		<canvas id="canvas" width=64 height=64></canvas>
+		<div class="bar topleft hidden">
+			<a href="/av#waves">Waves</a> (2016)
+			<br>
+			by <a href="/">Sytze Zeylmaker</a>
+			<br><br>
+			volume:
+			<input type="range" min="0" max="100" value="100" id="volume">
+			<br>
+			resolution:
+			<select id="resolution">
+				<option value="0">32x32</option>
+				<option value="1" selected>64x64</option>
+				<option value="2">128x128</option>
+				<option value="3">256x256</option>
+				<option value="4">512x512</option>
+				<option value="5">1024x1024</option>
+			</select>
+			<br>
+			<button id="stop">stop</button>
+		</div>
+		
+		<div class="bar botleft hidden">
+			other audiovisual works:<br>
+			<a href="/av/phi">Phi</a> (2018)<br>
+			<a href="/av/shapes">Shapes</a> (2015)<br>
+			<a href="/av/rg">Red Green</a> (2015)<br>
+		</div>
+
+		<button id="play" class="play">play</button>
+	</body>
+	
+	<script id="vertex" type="glsl">
+		attribute vec2 a_position;
+		void main() {
+			gl_Position = vec4(a_position, 0, 1);
+		}
+	</script>
+	
+	<script id="fragment" type="glsl">
+		precision lowp float;
+		#define pi 3.1415926535897932384626433832795
+		
+		uniform sampler2D u_oscs;
+		
+		uniform float u_time;
+    
+    uniform int u_mode;
+		
+		uniform int u_lvl; // amount of waves
+
+		uniform float u_resolution;
+		
+		void main() {
+			vec2 p = gl_FragCoord.xy/vec2(u_resolution, u_resolution);
+			
+			float real = 0.0;
+			float imag = 0.0;
+			
+			int x = 1, y = 1;
+			float mag;
+			float phase;
+			float ii;
+			float step = 1.0 / float(u_lvl*u_lvl);
+			for (int i = 0; i < 16*16; i++) {
+				if (i > u_lvl*u_lvl) break;
+				
+				if (x>u_lvl) {
+					x = 1;
+					y++;
+				}
+				
+				ii = float(i) * step;
+				
+				mag = texture2D(u_oscs, vec2(ii, 0)).a;
+				if (mag != 0.0) {
+			  	phase = texture2D(u_oscs, vec2(ii + step*0.5, 0)).a;
+			  	
+			  	mag *= sin(p.x * float(x) * pi) *
+			  		sin(p.y * float(y) * pi);
+			  	phase += u_time * float(x*x + y*y) * pi;
+			  	
+			  	real += mag * sin(phase);
+			  	imag += mag * cos(phase);
+			 	}
+				x++;
+			}
+			
+			float prob = (real*real + imag*imag)*0.6;
+			//prob = pow(prob, 0.95);
+			
+			//gl_FragColor = vec4(prob, real*0.7, imag*0.7, 1.0);
+			//gl_FragColor = vec4(prob, real*0.02 + prob, imag*0.02 + prob, 1.0);
+			if (u_mode == 0)
+        gl_FragColor = vec4(prob, prob, prob, 1.0);
+      else 
+        gl_FragColor = vec4(prob, real*0.5, imag*0.5, 1.0);
+		}
+	</script>
+	
+	<script src="waves/shader.js"></script>
+	<script src="waves/qshader.js"></script>	
+	<script src="waves/audioscan.js"></script>
+	<script src="waves/script.js"></script>		
+	<script src="waves/timeline.js"></script>
+
+	<script src="ui.js"></script>
+
+	<script>
+		[
+			["volume", "input", function(e) {
+				master.gain.value = e.srcElement.value / 100.0;
+			}],
+			["resolution", "change", function(e) {
+				var resolution = Math.pow(2, e.srcElement.value) * 32;
+
+				document.getElementById("canvas").width = resolution;
+				document.getElementById("canvas").height = resolution;
+
+				qss.resolution = resolution;
+				
+				gl.viewport(0, 0, resolution, resolution);
+			}],
+			["stop", "click", function() {
+				//qss.reset();
+				audio.suspend();
+				goto(timeline.length);
+				paused = true;
+				document.getElementById("play").classList.remove("hidden");
+			}],
+			["play", "click", function(e) {
+				clockspeed = 0.00005;
+				qss.reset();
+				goto(0);
+				audio.resume();
+				paused = false;
+				e.srcElement.classList.add("hidden");
+			}],
+		].forEach(function(v) {
+			document.getElementById(v[0]).addEventListener(v[1], v[2]);
+		});
+	</script>
+</html>
