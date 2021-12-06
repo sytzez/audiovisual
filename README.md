@@ -1,6 +1,6 @@
 ## Introduction
 
-These pieces were originally deviced to be performed in a concert setting, in a dim room with a large screen or projector.
+These pieces were originally created to be performed in a concert setting, in a dim room with a large screen or projector.
 They explore the relationships between music, sound, video, mathematical equations and physical phenomena.
 Some of them have a fixed compositional structure; others are meant to be used in improvisation, being controlled using a MIDI device.
 
@@ -60,12 +60,32 @@ The colors that eventually appear in the piece are created by outputting the rea
 In music and sound in general, the [harmonic series](https://en.wikipedia.org/wiki/Harmonic_series_(music)) is seen as the basis for [timbre](https://en.wikipedia.org/wiki/Timbre)
 and [harmony](https://en.wikipedia.org/wiki/Harmony).
 One reason for this is that when different frequencies from a harmonic series are played together, they form a single repeated wave at the root frequency of the series.
-In other words, there will be no phase shifting, and the result sounds pleasing to the ear. 
+In other words, all the waves fit neatly together and the result sounds pleasing to the ear. 
 *With this piece I propose a new way of structuring frequencies, that has the same harmonious properties as the harmonic series.*
 
-Normally, a pitched sound wave repeats itself with the same wavelength. This constant wavelength causes it to have a constant frequency.
-In this piece, I use alternating wavelength, meaning every time the wave repeats itself it has a different wavelength.
+![](/phi/octaves-phi.jpg)
 
+A series of octaves, having frequencies of factors `1, 2, 4, 8...`, sound perfectly consonant because the 
+[nodes](https://en.wikipedia.org/wiki/Node_(physics)) line up in many places (see left graph).
+In this piece however, the waves are irregular, alternating between short (`S`) and long (`L`) wavelengths (see right graph).
+This alternating wave is produced at frequencies of factors `1, φ, φ², φ³...`, φ being the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio).
+As you can see in the graph, these waves also have many nodes that line up, just like the octaves, resulting in a consonant sound.
+
+The reason for the nodes lining up lies in the specific specific sequence of long (`L`) and short (`S`) wavelengths.
+This sequence can be constructed using an algorithm similar to how the [fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number) is calculated:
+1. Start out with `L` `S`
+2. Take the first part (`L`) and add it to the end. Group together the original sequence (`L` `S` -> `L S`). Result: `L S` `L`
+3. Take the first part (`L S`) and add it to the end. Group together the original sequence. Result: `L S L` `L S`
+4. Keep repeating this step. `L S L L S` `L S L`
+5. `L S L L S L S L` `L S L L S`
+6. ...ad infinitum
+
+This results in a sequence that can continue infinitely without repeating itself. Yet it is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in a slower tempo. This would produce the following two perfectly aligning layers:
+```
+L S|L|L S|L S|L S|L|L S
+L  |S|L  |L  |L  |S|L
+```
+This self-similarity, which continues into infinity when you keep slowing the tempo, makes this sequence a [fractal](https://en.wikipedia.org/wiki/Fractal).
 
 
 ## Technique
@@ -80,8 +100,7 @@ In this piece, I use alternating wavelength, meaning every time the wave repeats
 
 ## Concept
 
-This piece uses [ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)) to create many kinds of visual landscapes. 
-Noise is added at various parts of the algorithm to create interesting visual distortions.
+This piece uses [ray tracing](https://en.wikipedia.org/wiki/Ray_tracing_(graphics)) to create many kinds of visual landscapes. It adds noise at various parts of the algorithm to created visual distortions.
 
 ## Technique
 
