@@ -80,15 +80,22 @@ This sequence can be constructed using an algorithm similar to how the [fibonacc
 5. `L S L L S L S L` `L S L L S`
 6. ...ad infinitum
 
-This results in a sequence that can continue infinitely without repeating itself. Yet it is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in a slower tempo. This would produce the following two perfectly aligning layers:
+This results in a sequence that can continue infinitely without repeating itself. Yet it is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in a slower tempo. At an even slower tempo, `L S L` could be like `L`, and `L S` like `S`. This would produce the following three perfectly aligning layers:
 ```
-L S|L|L S|L S|L S|L|L S
-L  |S|L  |L  |L  |S|L
+L|S|L|L|S|L|S|L|L|S|L|L|S|
+L  |S|L  |L  |S|L  |S|L  |
+L    |S  |L    |L    |S  |
 ```
 This self-similarity, which continues into infinity when you keep slowing the tempo, makes this sequence a [fractal](https://en.wikipedia.org/wiki/Fractal).
+If the wavelength of `L` and `S` differ by a ratio of `φ`, the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio), the ratio between `L` and `S` in each
+consequent layer will also be that of `φ`. This makes it possible to keep adding waves at higher and lower frequencies, which will all have common nodes, as shown in the graph above.
 
+Besides use for generating consonant tones of different pitches, it can also be used to create overlapping rhythms, just by using lower frequencies.
+The piece combines both, and uses even lower frequencies to direct structural sections, turning certain voices off and on at certain points.
 
 ## Technique
+
+The whole concept as explained above boils down to one function: 
 
 ## Results
 
