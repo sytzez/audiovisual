@@ -14,7 +14,9 @@ Some of them have a fixed compositional structure; others are meant to be used i
 
 # Waves
 
-[https://sytzez.github.io/audiovisual/waves.html](https://sytzez.github.io/audiovisual/waves.html)
+Duration: 9 minutes
+
+View: [https://sytzez.github.io/audiovisual/waves.html](https://sytzez.github.io/audiovisual/waves.html)
 
 ## Concept
 
@@ -53,7 +55,9 @@ The colors that eventually appear in the piece are created by outputting the rea
 
 # Phi
 
-[https://sytzez.github.io/audiovisual/phi.html](https://sytzez.github.io/audiovisual/phi.html)
+No fixed structure
+
+View: [https://sytzez.github.io/audiovisual/phi.html](https://sytzez.github.io/audiovisual/phi.html)
 
 ## Concept
 
@@ -118,7 +122,9 @@ The entire piece is generated from this function, though leaving some parameters
 
 # Shapes
 
-[https://sytzez.github.io/audiovisual/shapes.html](https://sytzez.github.io/audiovisual/shapes.html)
+No fixed structure
+
+View: [https://sytzez.github.io/audiovisual/shapes.html](https://sytzez.github.io/audiovisual/shapes.html)
 
 ## Concept
 
@@ -137,7 +143,9 @@ This makes the character of the audio match the character of the visuals, althou
 
 # Red green
 
-[https://sytzez.github.io/audiovisual/rg.html](https://sytzez.github.io/audiovisual/rg.html)
+Duration: 8 minutes
+
+View: [https://sytzez.github.io/audiovisual/rg.html](https://sytzez.github.io/audiovisual/rg.html)
 
 ## Concept
 
