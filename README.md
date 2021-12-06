@@ -78,7 +78,7 @@ This sequence can be constructed using an algorithm similar to how the [fibonacc
 3. Take the first part (`L S`) and add it to the end. Group together the original sequence. Result: `L S L` `L S`
 4. Keep repeating this step. `L S L L S` `L S L`
 5. `L S L L S L S L` `L S L L S`
-6. ...ad infinitum
+6. ...repeat ad infinitum
 
 This results in a sequence that can continue infinitely without repeating itself. Yet it is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in a slower tempo. At an even slower tempo, `L S L` could be like `L`, and `L S` like `S`. This would produce the following three perfectly aligning layers:
 ```
@@ -95,7 +95,22 @@ The piece combines both, and uses even lower frequencies to direct structural se
 
 ## Technique
 
-The whole concept as explained above boils down to one function: 
+The whole concept as explained above boils down to one function, where `x` is a position in time:
+```javascript
+const phi = (1 + Math.sqrt(5)) * 0.5;
+const inverseLnPhi = 1.0 / Math.log(phi);
+
+function phi(x) {
+  while (x > phi) {
+    x -= Math.pow(phi, Math.floor(Math.log(x) * inverseLnPhi));
+  }
+  return x;
+}
+```
+This returns the distance of `x` from the last `L` or `S` boundary before it in the sequence as described before.
+In other words, it keeps starting from `0` every time it passes a `L` or `S` boundary, and then increases in value until it reaches the next boundary.
+This can be used a a basis of generating a semi-sine wave, a rhythm or a structure.
+The entire piece is generated from this function, though leaving some parameters free to be improvised with using a MIDI controller.
 
 ## Results
 
