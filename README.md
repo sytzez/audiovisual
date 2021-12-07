@@ -52,7 +52,10 @@ The colors that eventually appear in the piece are created by outputting the rea
 
 ## Results
 
-![](/waves/ss4_small.png)
+![](/waves/clip-1.gif)
+![](/waves/clip-2.gif)
+![](/waves/clip-3.gif)
+![](/waves/clip-4.gif)
 
 # Phi
 
