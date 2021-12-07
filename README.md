@@ -124,8 +124,8 @@ The entire piece is generated from this function, though some parameters are lef
 
 ## Results
 
-![](/phi/ss1.png)
 ![](/phi/ss2_small.png)
+Go to [https://sytzez.github.io/audiovisual/phi.html](https://sytzez.github.io/audiovisual/phi.html) to hear audio.
 
 # Shapes
 
