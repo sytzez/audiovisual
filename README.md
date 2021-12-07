@@ -147,7 +147,10 @@ This makes the character of the audio match the character of the visuals, althou
 
 ## Results
 
-![](/shapes/ss.png)
+![](/shapes/clip-1.gif)
+![](/shapes/clip-2.gif)
+![](/shapes/clip-3.gif)
+![](/shapes/clip-4.gif)
 
 # Red green
 
