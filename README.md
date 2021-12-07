@@ -20,33 +20,33 @@ View: [https://sytzez.github.io/audiovisual/waves.html](https://sytzez.github.io
 
 ## Concept
 
-This piece explores using [wave functions](https://en.wikipedia.org/wiki/Wave_function) from [quantum physics](https://en.wikipedia.org/wiki/Quantum_mechanics)
-as the source of audio and video generation.
-Wave functions show the probability of a particle to be at any given location. 
-When bounded in a 'box', as used in the piece, this can result in [standing waves](https://en.wikipedia.org/wiki/Standing_wave) (see picture below)
-which means it can produce the frequencies of the [harmonic series](https://en.wikipedia.org/wiki/Harmonic_series_(music)),
+This piece explores the use of [wave functions](https://en.wikipedia.org/wiki/Wave_function) from [quantum physics](https://en.wikipedia.org/wiki/Quantum_mechanics)
+in audio and video generation.
+A wave function is a probability field, showing how likely it is for a particle to be at a given location within the field. 
+When a particle is bounded in a 'box', with barriers around it, the wave function may contain [standing waves](https://en.wikipedia.org/wiki/Standing_wave) (see picture below), which is employed in the piece.
+This means the wave function can produce the frequencies of the [harmonic series](https://en.wikipedia.org/wiki/Harmonic_series_(music)),
 relating it to [harmony](https://en.wikipedia.org/wiki/Harmony) in music.
 
 ![](https://upload.wikimedia.org/wikipedia/commons/2/27/Quantum_mechanics_standing_wavefunctions.svg)
 
-[Schroedinger's equation](https://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation) is used to calculate how the wave function evolves over time.
-Practically, it comes down to shifting the phase of the real and imaginary sine waves that make up the wave function.
-This can create an [oscillatory motion](https://en.wikipedia.org/wiki/Oscillation) inside the wavefunction (see picture below), 
+[Schroedinger's equation](https://en.wikipedia.org/wiki/Schr%C3%B6dinger_equation) is used to calculate how a wave function evolves over time.
+Practically, it comes down to shifting the [phase](https://en.wikipedia.org/wiki/Phase_(waves)) of the real and imaginary sine waves that make up the wave function.
+This may result in an [oscillatory motion](https://en.wikipedia.org/wiki/Oscillation) inside the wavefunction (see picture below), 
 relating it to [rhythm](https://en.wikipedia.org/wiki/Rhythm) in music.
 
 ![](https://upload.wikimedia.org/wikipedia/commons/9/90/QuantumHarmonicOscillatorAnimation.gif)
 
 ## Technique
 
-A [GLSL fragment shader](https://www.khronos.org/opengl/wiki/Fragment_Shader) is used to calculate the wave function at every frame, for every pixel at the screen.
-To improve performance, I factored out all calculations that remain the same over all frames, so they only have to be calculated once.
+A [GLSL fragment shader](https://www.khronos.org/opengl/wiki/Fragment_Shader) is used to calculate the wave function at every frame, calculating its value at every pixel.
+To improve performance, I factored out all calculations that remain the same over all frames, so they only have to be calculated once, before the piece even starts.
 The results of these calculations are passed into the shader as a WebGL texture with only the alpha channel.
 After this performance improvement, the amount of sine calculations required per pixel per frame was drastically reduced.
 
 To create the "bouncing ball" effect that shows up at some point in the piece,
 a [Fourier transform](https://en.wikipedia.org/wiki/Fourier_transform) is used to turn 
 a 2D [normal distribution](https://en.wikipedia.org/wiki/Normal_distribution) (essentially the shape of a ball)
-into a series of sine waves at different frequencies. 
+into a series of sine waves at different frequencies and phases. 
 
 The colors that eventually appear in the piece are created by outputting the real and imaginary part of the wave function onto different color channels (RGB channels).
 
@@ -64,16 +64,17 @@ View: [https://sytzez.github.io/audiovisual/phi.html](https://sytzez.github.io/a
 
 In music and sound in general, the [harmonic series](https://en.wikipedia.org/wiki/Harmonic_series_(music)) is seen as the basis for [timbre](https://en.wikipedia.org/wiki/Timbre)
 and [harmony](https://en.wikipedia.org/wiki/Harmony).
-One reason for this is that when different frequencies from a harmonic series are played together, they form a single repeated wave at the root frequency of the series.
-In other words, all the waves fit neatly together and the result sounds pleasing to the ear. 
+The reason the harmonic series sounds so good when played together, is that they form a single repeated wave at the root frequency of the series, with no fluctuations over time.
+In other words, sound waves with frequencies belonging to the harmonic series fit neatly together, and sound pleasing to the ear. 
 *With this piece I propose a new way of structuring frequencies, that has the same harmonious properties as the harmonic series.*
 
 ![](/phi/octaves-phi.jpg)
 
 A series of octaves, having frequencies of factors `1, 2, 4, 8...`, sound perfectly consonant because the 
-[nodes](https://en.wikipedia.org/wiki/Node_(physics)) line up in many places (see left graph).
+[nodes](https://en.wikipedia.org/wiki/Node_(physics)) of its sound waves line up in many places (see left graph).
+Normally, each wave has a constant frequency and a constant wavelength.
 In this piece however, the waves are irregular, alternating between short (`S`) and long (`L`) wavelengths (see right graph).
-This alternating wave is produced at frequencies of factors `1, φ, φ², φ³...`, φ being the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio).
+I use this wave at different frequencies of factors `1, φ, φ², φ³...`, φ being the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio).
 As you can see in the graph, these waves also have many nodes that line up, just like the octaves, resulting in a consonant sound.
 
 The reason for the nodes lining up lies in the specific specific sequence of long (`L`) and short (`S`) wavelengths.
@@ -85,18 +86,19 @@ This sequence can be constructed using an algorithm similar to how the [fibonacc
 5. `L S L L S L S L` `L S L L S`
 6. ...repeat ad infinitum
 
-This results in a sequence that can continue infinitely without ever repeating itself. Yet it is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in a slower tempo. At an even slower tempo, `L S L` could be like `L`, and `L S` like `S`. This would produce the following three perfectly aligning layers:
+This sequence can continue infinitely without ever repeating itself. It also is self-similar when viewed at different speeds. For example: `L S` together could be equivalent `L` in a slower tempo, and `L` could be equivalent to `S` in that tempo. At an even slower tempo, `L S L` could map to `L`, and `L S` to `S`. This would produce the following three perfectly aligning layers:
 ```
-L|S|L|L|S|L|S|L|L|S|L|L|S|
-L  |S|L  |L  |S|L  |S|L  |
-L    |S  |L    |L    |S  |
+L|S|L|L|S|L|S|L|L|S|L|L|S|...
+L  |S|L  |L  |S|L  |S|L  |...
+L    |S  |L    |L    |S  |...
+...
 ```
-This self-similarity which continues into infinity when adding more layers, makes this sequence a [fractal](https://en.wikipedia.org/wiki/Fractal).
-If the wavelength of `L` and `S` differ by the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) (`φ`), the ratio between `L` and `S` in each
-consequent layer will be the same. This makes it possible to keep adding waves at higher and lower frequencies, which will all have common nodes, as shown in the graph above on the right.
+This self-similarity, which continues into infinity when adding more layers, makes this sequence a [fractal](https://en.wikipedia.org/wiki/Fractal).
+When the wavelength of `L` and `S` differ by the [golden ratio](https://en.wikipedia.org/wiki/Golden_ratio) (`φ`), the ratio between `L` and `S` in each
+consequent layer will also differ by the golden ratio. This makes it possible to keep adding waves at higher and lower frequencies, which will all have common nodes, as shown in the graph above on the right.
 
-Besides use for generating consonant tones of different pitches, it can also be used to create overlapping rhythms, just by using lower frequencies.
-The piece combines both, and uses even lower frequencies to direct structural sections, turning certain voices off and on at certain points.
+When this sequence is used at lower frequencies, it form rhythms instead of tones. These rhythms overlap at many points, just like the nodes in the tones overlap.
+At even lower frequencies the sequences can be used to direct the musical structure, turning certain voices off and on at certain points.
 
 ## Technique
 
@@ -112,10 +114,10 @@ function phi(x) {
   return x;
 }
 ```
-This returns the distance of `x` from the last `L` or `S` boundary before it in the sequence as described before.
-In other words, it keeps starting from `0` every time it passes a `L` or `S` boundary, and then increases in value until it reaches the next boundary.
-This can be used a a basis of generating a sound wave, a rhythm or a structure.
-The entire piece is generated from this function, though leaving some parameters free to be improvised with using a MIDI controller.
+The function returns the distance of `x` from the latest `L` or `S` boundary before it.
+In other words, it keeps starting from `0` every time it passes an `L` or `S` boundary, and then gradually increases unit it reaches the next boundary and jumps back to `0`.
+The function is used as the basis of other function that generate sound waves, rhythm and structure.
+The entire piece is generated from this function, though some parameters are left free to be used in improvisation using a MIDI controller.
 
 ## Results
 
